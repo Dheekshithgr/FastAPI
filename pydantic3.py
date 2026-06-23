@@ -37,8 +37,6 @@ def update_account(patient:Patient):
     print(patient.allergies)
     print('Account updated successfully!')
     
-    
-    
 patient_info={'name':'Abc','age':50,'weight':66.6,'allergies':['pollen','dust'],'contacts':{'name':'Xyz','phone':'989775'},'email':'abcd@hdfc.com','url':'https://google.com'}
 
 patient1=Patient(**patient_info)
