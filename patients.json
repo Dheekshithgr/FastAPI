@@ -1,0 +1,22 @@
+{
+  "P001": {
+    "name": "Ananya Sharma",
+    "city": "Guwahati",
+    "age": 28,
+    "gender": "female",
+    "height": 1.65,
+    "weight": 90,
+    "bmi": 33.06,
+    "verdict": "Obese"
+  },
+  "P002": {
+    "name": "Chamak cholo",
+    "city": "Dubai",
+    "age": 25,
+    "gender": "male",
+    "height": 1.73,
+    "weight": 80,
+    "bmi": 35.06,
+    "verdict": "normal"
+  }
+}
