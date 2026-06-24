@@ -213,8 +213,8 @@ GET /sort?sort_by=weight&order=desc
 Clone the repository:
 
 ```bash
-git clone https://github.com/Dheekshithgr/FastAPI.git
-cd FastAPI
+git clone https://github.com/Dheekshithgr/patient-management-api
+cd patient-management-api
 ```
 
 Install dependencies:
