@@ -1,24 +1,68 @@
-# FastAPI & Pydantic Practice Project
+# Patient Management API using FastAPI
 
 ## Overview
 
-This project is a hands-on implementation of **FastAPI** and **Pydantic** concepts. It demonstrates API development, request validation, nested models, custom validators, query parameters, path parameters, and exception handling.
+A RESTful Patient Management API built using **FastAPI** and **Pydantic**. This project demonstrates CRUD operations, request validation, computed fields, query parameters, path parameters, and JSON-based data persistence.
 
-The project uses patient data stored in a JSON file and provides endpoints to view, search, and sort patient records.
+Patient records are stored in a local `patients.json` file and can be created, viewed, updated, deleted, and sorted through API endpoints.
 
 ---
 
 ## Features
 
-* REST API development using FastAPI
-* Path Parameters and Query Parameters
-* Custom HTTP Exception Handling
-* JSON Data Management
-* Nested Pydantic Models
-* Email and URL Validation
-* Field Constraints using `Field()`
-* Custom Validation using `field_validator`
-* Automatic API Documentation with Swagger UI
+* Create, Read, Update, and Delete (CRUD) patient records
+* Data validation using Pydantic models
+* Partial updates using a dedicated update schema
+* Automatic BMI calculation using computed fields
+* BMI health classification (Underweight, Normal, Overweight, Obese)
+* Sorting patients by height, weight, or BMI
+* Custom error handling using FastAPI HTTP exceptions
+* Interactive API documentation with Swagger UI and ReDoc
+* JSON-based storage without requiring a database
+
+---
+
+## Project Structure
+
+```text
+.
+├── main.py
+├── patients.json
+└── README.md
+```
+
+---
+
+## Patient Schema
+
+```python
+class Patient(BaseModel):
+    id: str
+    name: str
+    city: str
+    age: int
+    gender: Literal["male", "female", "others"]
+    height: float
+    weight: float
+```
+
+### Computed Fields
+
+The API automatically calculates:
+
+```python
+bmi
+bmi_verdict
+```
+
+BMI Categories:
+
+| BMI Range   | Verdict     |
+| ----------- | ----------- |
+| < 18.5      | Underweight |
+| 18.5 - 24.9 | Normal      |
+| 25 - 29.9   | Overweight  |
+| >= 30       | Obese       |
 
 ---
 
@@ -32,13 +76,7 @@ GET /
 
 Returns a welcome message.
 
-### About
-
-```http
-GET /about
-```
-
-Returns a simple response about the application.
+---
 
 ### View All Patients
 
@@ -46,7 +84,9 @@ Returns a simple response about the application.
 GET /view
 ```
 
-Displays all patient records stored in `patients.json`.
+Returns all patient records.
+
+---
 
 ### Get Patient by ID
 
@@ -60,109 +100,101 @@ Example:
 GET /patient/P001
 ```
 
-Returns details of the requested patient.
+Returns details of the specified patient.
+
+---
+
+### Create Patient
+
+```http
+POST /create
+```
+
+Example Request Body:
+
+```json
+{
+  "id": "P001",
+  "name": "Rahul",
+  "city": "Bangalore",
+  "age": 22,
+  "gender": "male",
+  "height": 1.75,
+  "weight": 72
+}
+```
+
+---
+
+### Update Patient
+
+```http
+PUT /update?patient_id=P001
+```
+
+Supports partial updates.
+
+Example Request Body:
+
+```json
+{
+  "weight": 78
+}
+```
+
+Only the provided fields are updated.
+
+---
+
+### Delete Patient
+
+```http
+DELETE /delete/P001
+```
+
+Deletes the specified patient record.
+
+---
 
 ### Sort Patients
 
 ```http
-GET /sort?sort_by=weight&order=desc
+GET /sort?sort_by=bmi&order=desc
 ```
 
-Supported fields:
+Supported Sorting Fields:
 
 * height
 * weight
 * bmi
 
-Supported orders:
+Supported Order:
 
 * asc
 * desc
 
+Examples:
+
+```http
+GET /sort?sort_by=height&order=asc
+```
+
+```http
+GET /sort?sort_by=weight&order=desc
+```
+
 ---
 
-## Pydantic Models
-
-### Address Model
-
-```python
-class Address(BaseModel):
-    city: str
-    state: str
-    pincode: int
-```
+## Validation Rules
 
 ### Patient Model
 
-```python
-class Patient(BaseModel):
-    name: str
-    age: int
-    address: Address
-    email: EmailStr
-```
-
-Demonstrates nested model validation using Pydantic.
-
----
-
-## Field Validation
-
-```python
-age: int = Field(gt=0, lt=100)
-weight: float = Field(gt=0, strict=True)
-```
-
-Validation Rules:
-
-* Age must be between 0 and 100
-* Weight must be greater than 0
-* Strict type checking enabled
-
----
-
-## Custom Validators
-
-### Email Domain Validation
-
-```python
-@field_validator('email')
-@classmethod
-def email_validator(cls, value):
-```
-
-Allowed domains:
-
-* hdfc.com
-* icici.com
-
-Example:
-
-```text
-✓ abc@hdfc.com
-✗ abc@gmail.com
-```
-
-### Name Transformation
-
-```python
-@field_validator('name')
-@classmethod
-def transform_name(cls, value):
-    return value.upper()
-```
-
-Automatically converts names to uppercase.
-
-### Age Validation
-
-```python
-@field_validator('age')
-@classmethod
-def validate_age(cls, value):
-```
-
-Ensures age is within the valid range.
+| Field  | Validation                |
+| ------ | ------------------------- |
+| age    | Must be between 1 and 119 |
+| height | Must be greater than 0    |
+| weight | Must be greater than 0    |
+| gender | male, female, or others   |
 
 ---
 
@@ -178,10 +210,17 @@ Ensures age is within the valid range.
 
 ## Installation
 
-Install required packages:
+Clone the repository:
 
 ```bash
-pip install fastapi uvicorn pydantic email-validator
+git clone https://github.com/Dheekshithgr/FastAPI.git
+cd FastAPI
+```
+
+Install dependencies:
+
+```bash
+pip install fastapi uvicorn pydantic
 ```
 
 Run the application:
@@ -190,11 +229,17 @@ Run the application:
 uvicorn main:app --reload
 ```
 
+Server:
+
+```text
+http://127.0.0.1:8000
+```
+
 ---
 
 ## API Documentation
 
-FastAPI automatically generates interactive API documentation.
+FastAPI automatically generates API documentation.
 
 Swagger UI:
 
@@ -215,14 +260,15 @@ http://127.0.0.1:8000/redoc
 Through this project, I learned:
 
 * FastAPI fundamentals
-* Building REST APIs
-* Request validation using Pydantic
-* Nested Models
-* Query & Path Parameters
-* Custom Validators
-* Exception Handling
-* API Documentation Generation
-* Working with JSON Data
+* REST API development
+* Pydantic data validation
+* Computed fields
+* CRUD operations
+* Path and Query parameters
+* Exception handling
+* JSON data persistence
+* API documentation generation
+* Partial updates using update schemas
 
 ```
 ```
